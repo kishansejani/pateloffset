@@ -20,7 +20,15 @@ class DashboardController extends Controller
                 'inquiries' => Inquiry::where('is_read', false)->count(),
                 'products'  => Product::count(),
             ],
-            'orders'    => Order::latest()->take(8)->get(),
+            'orders'    => Order::withCount('items')->latest()->take(10)->get(),
+            'chart'     => collect(range(13, 0))->map(function ($d) {
+                $day = now()->subDays($d);
+                $q = Order::whereDate('created_at', $day->toDateString());
+
+                return ['label' => $day->format('d M'), 'short' => $day->format('d'), 'orders' => (clone $q)->count(), 'revenue' => (float) (clone $q)->where('payment_status', 'paid')->sum('total')];
+            }),
+            'statusMix' => Order::selectRaw('status, count(*) as c')->groupBy('status')->pluck('c', 'status'),
+            'topProducts' => \App\Models\Product::orderByDesc('views')->take(5)->get(),
             'inquiries' => Inquiry::latest()->take(6)->get(),
         ]);
     }

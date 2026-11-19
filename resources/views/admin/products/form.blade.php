@@ -1,5 +1,12 @@
 @extends('admin.layout')
 @section('title', $product->exists ? 'Edit Product' : 'Add Product')
+@section('crumb', 'Products')
+@section('icon', $product->exists ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-plus')
+@section('subtitle', $product->exists ? 'Update details, pricing and visibility for '.$product->name.'.' : 'Create a new printing product with quantity-based pricing.')
+@section('actions')
+    <a href="{{ route('admin.products.index') }}" class="ap-btn"><i class="fa-solid fa-arrow-left"></i>Back to products</a>
+    @if($product->exists)<a href="{{ route('product', $product) }}" target="_blank" class="ap-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i>View on site</a>@endif
+@endsection
 
 @php
     $tiersText = old('tiers_text', collect($product->price_tiers ?? [])->map(fn ($t) => $t['qty'].' = '.$t['price'])->implode("\n"));
@@ -10,8 +17,9 @@
 <form method="POST" enctype="multipart/form-data" action="{{ $product->exists ? route('admin.products.update', $product) : route('admin.products.store') }}">
     @csrf @if($product->exists) @method('PUT') @endif
     @if($errors->any())<div class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i>{{ $errors->first() }}</div>@endif
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:22px" class="order-grid">
-        <div class="card form-grid">
+    <div class="ap-grid-2">
+        <div class="ap-card ap-card-pad form-grid" style="align-content:start">
+            <h3 class="full" style="margin:0"><i class="fa-solid fa-circle-info" style="color:var(--ac)"></i> Product details</h3>
             <div class="field full"><label>Name *</label><input class="input" name="name" value="{{ old('name', $product->name) }}" required></div>
             <div class="field"><label>Category *</label><select class="input" name="category_id">@foreach($categories as $c)<option value="{{ $c->id }}" @selected(old('category_id', $product->category_id) == $c->id)>{{ $c->name }}</option>@endforeach</select></div>
             <div class="field"><label>Slug (auto if empty)</label><input class="input" name="slug" value="{{ old('slug', $product->slug) }}"></div>
@@ -25,7 +33,7 @@
             <div class="field"><label>Dispatch time *</label><input class="input" name="dispatch_time" value="{{ old('dispatch_time', $product->dispatch_time) }}" required></div>
         </div>
         <div>
-            <div class="card">
+            <div class="ap-card ap-card-pad">
                 <h3>Image</h3>
                 <div style="border-radius:14px;overflow:hidden;margin-bottom:12px"><x-mockup :art="$product->art ?? 'card'" :color="$product->color" :title="$product->name ?: 'Preview'" :image="$product->image"/></div>
                 <input type="file" name="image" accept="image/*" class="input">
@@ -36,15 +44,14 @@
                     <div class="field"><label>Colour</label><input class="input" type="color" name="color" value="{{ old('color', $product->color) }}" style="height:46px;padding:4px"></div>
                 </div>
             </div>
-            <div class="card">
+            <div class="ap-card ap-card-pad">
                 <h3>Visibility</h3>
                 @foreach(['is_active' => 'Active (visible on site)', 'is_new' => 'New Arrival', 'is_bestseller' => 'Bestseller', 'is_hot' => 'Hot Product', 'is_featured' => 'Featured'] as $f => $l)
-                    <label style="display:flex;gap:10px;margin-bottom:10px;font-weight:600"><input type="checkbox" name="{{ $f }}" value="1" @checked(old($f, $product->$f))> {{ $l }}</label>
+                    <label class="sw" style="display:flex;margin-bottom:14px"><input type="checkbox" name="{{ $f }}" value="1" @checked(old($f, $product->$f))><span class="tr"></span>{{ $l }}</label>
                 @endforeach
             </div>
-            <button class="btn btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Product</button>
+            <button class="ap-btn dark" style="width:100%;justify-content:center;height:54px"><i class="fa-solid fa-floppy-disk"></i>Save product</button>
         </div>
     </div>
 </form>
-<style>@media(max-width:1000px){.order-grid{grid-template-columns:1fr!important}}</style>
 @endsection

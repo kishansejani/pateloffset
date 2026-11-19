@@ -40,6 +40,14 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Category updated.');
     }
 
+    public function toggle(Request $request, Category $category)
+    {
+        $request->validate(['field' => ['required', Rule::in(['is_active'])]]);
+        $category->update(['is_active' => $request->boolean('value')]);
+
+        return response()->json(['ok' => true, 'message' => $category->name.' is now '.($category->is_active ? 'active' : 'hidden').'.']);
+    }
+
     public function destroy(Category $category)
     {
         if ($category->products()->exists()) {

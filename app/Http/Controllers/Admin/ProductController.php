@@ -17,10 +17,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::with('category')
-            ->when($request->q, fn ($q, $s) => $q->where('name', 'like', "%$s%"))
-            ->when($request->category, fn ($q, $c) => $q->where('category_id', $c))
-            ->latest()->paginate(20)->withQueryString();
+        $products = Product::with('category')->latest()->get();
 
         return view('admin.products.index', ['products' => $products, 'categories' => Category::orderBy('sort')->get()]);
     }
@@ -47,6 +44,14 @@ class ProductController extends Controller
         $product->update($this->validated($request, $product));
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated.');
+    }
+
+    public function toggle(Request $request, Product $product)
+    {
+        $field = $request->validate(['field' => ['required', Rule::in(['is_active', 'is_featured', 'is_new', 'is_bestseller', 'is_hot'])]])['field'];
+        $product->update([$field => $request->boolean('value')]);
+
+        return response()->json(['ok' => true, 'message' => $product->name.' updated.']);
     }
 
     public function destroy(Product $product)

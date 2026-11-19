@@ -48,6 +48,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('inquiries', [Admin\InquiryController::class, 'index'])->name('inquiries.index');
         Route::patch('inquiries/{inquiry}', [Admin\InquiryController::class, 'toggle'])->name('inquiries.toggle');
         Route::delete('inquiries/{inquiry}', [Admin\InquiryController::class, 'destroy'])->name('inquiries.destroy');
+        Route::patch('products/{product}/toggle', [Admin\ProductController::class, 'toggle'])->name('products.toggle');
+        Route::patch('categories/{category}/toggle', [Admin\CategoryController::class, 'toggle'])->name('categories.toggle');
         Route::resource('products', Admin\ProductController::class)->except('show');
         Route::resource('categories', Admin\CategoryController::class)->except('show');
     });

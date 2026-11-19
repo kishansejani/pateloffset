@@ -11,11 +11,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $orders = Order::withCount('items')
-            ->when($request->q, fn ($q, $s) => $q->where(fn ($w) => $w->where('order_number', 'like', "%$s%")->orWhere('name', 'like', "%$s%")->orWhere('phone', 'like', "%$s%")))
-            ->when($request->status, fn ($q, $s) => $q->where('status', $s))
-            ->when($request->payment, fn ($q, $s) => $q->where('payment_status', $s))
-            ->latest()->paginate(20)->withQueryString();
+        $orders = Order::withCount('items')->latest()->get();
 
         return view('admin.orders.index', compact('orders'));
     }

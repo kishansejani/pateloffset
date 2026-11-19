@@ -23,5 +23,15 @@ class AppServiceProvider extends ServiceProvider
             $view->with('navCategories', Category::active()->with('activeProducts')->get());
             $view->with('cartCount', Cart::count());
         });
+
+        View::composer('admin.layout', function ($view) {
+            $newOrders = \App\Models\Order::whereIn('status', ['pending', 'confirmed'])->where('payment_status', 'paid')->latest()->take(5)->get();
+            $newInquiries = \App\Models\Inquiry::where('is_read', false)->latest()->take(5)->get();
+            $view->with('adminBadges', [
+                'orders'    => \App\Models\Order::whereIn('status', ['pending', 'confirmed'])->where('payment_status', 'paid')->count(),
+                'inquiries' => \App\Models\Inquiry::where('is_read', false)->count(),
+            ]);
+            $view->with('adminNotes', compact('newOrders', 'newInquiries'));
+        });
     }
 }
