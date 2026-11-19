@@ -1,0 +1,20 @@
+# Copy these lines into htdocs/.env on the server (replace the matching lines).
+# Get the MySQL values from InfinityFree control panel -> MySQL Databases.
+
+APP_ENV=production
+APP_DEBUG=false          # set to true ONLY while fixing an error, then back to false
+APP_URL=http://pateloffset.gt.tc
+
+DB_CONNECTION=mysql
+DB_HOST=sqlXXX.infinityfree.com      # "MySQL Hostname" from the panel (NOT 127.0.0.1)
+DB_PORT=3306
+DB_DATABASE=if0_XXXXXXXX_pateloffset # full database name from the panel
+DB_USERNAME=if0_XXXXXXXX             # "MySQL Username" from the panel
+DB_PASSWORD=your_vpanel_password     # your InfinityFree hosting account password
+
+# InfinityFree cannot create the storage symlink, so uploads go straight into public/storage
+PUBLIC_DISK_ROOT=public/storage
+
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync

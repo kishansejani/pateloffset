@@ -1,0 +1,17 @@
+# Upload this file to:  htdocs/.htaccess   (the ROOT, next to artisan / composer.json)
+# It sends every request into the public/ folder, where Laravel's index.php lives.
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Don't rewrite requests that already point into /public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Never serve secrets or project files directly
+<FilesMatch "^(\.env.*|composer\.(json|lock)|package\.json|phpunit\.xml|vite\.config\.js|artisan|README\.md)$">
+    Require all denied
+</FilesMatch>
